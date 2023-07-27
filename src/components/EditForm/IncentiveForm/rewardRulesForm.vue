@@ -186,7 +186,7 @@
               :value="op.value"
             />
           </el-select>
-          <div v-if="rewardRulesForm.recommender_award_type == 1" style="margin-left: 20px;">
+          <div v-if="rewardRulesForm.recommender_award_type == 3" style="margin-left: 20px;">
             <el-checkbox v-model="rewardRulesForm.recommender_single_coupon_code" label="每人独立Coupon Code"></el-checkbox>
           </div>
         </el-form-item>
@@ -197,18 +197,18 @@
           <el-input v-model="rewardRulesForm.recommender_tourists_coupon_code" clearable></el-input>
         </el-form-item>
         <el-form-item label="折扣" prop="recommender_discount_value" class="rebates-switch">
-          <el-input v-model="rewardRulesForm.recommender_discount_value" clearable></el-input>
+          <el-input v-model.number="rewardRulesForm.recommender_discount_value" clearable></el-input>
           <el-switch
             v-model="rewardRulesForm.recommender_discount_unit"
-            active-text="$"
-            inactive-text="%"
+            active-text="%"
+            inactive-text="$"
             active-color="#2B7DE1"
             inactive-color="#2B7DE1"
           >
           </el-switch>
         </el-form-item>
         <el-form-item label="订单金额门槛" prop="recommender_order_threshold_amount" class="rebates-switch">
-          <el-input v-model="rewardRulesForm.recommender_order_threshold_amount" clearable></el-input>
+          <el-input v-model.number="rewardRulesForm.recommender_order_threshold_amount" clearable></el-input>
           <span>$</span>
         </el-form-item>
         <el-form-item label="商品SKU" required class="frontLimit">
@@ -238,7 +238,7 @@
     </el-form>
     <el-form v-if="groupRulesForm.active_type == '2'" ref="rewardRulesForm" :model="groupRulesForm" :rules="groupRulesRules" label-position="left" label-width="130px" class="demo-Form demo-rewardRulesForm">
       <span class="partition">奖励对象Target成团</span>
-      <el-form-item label="奖励对象" prop="fission_award_object_type">
+      <el-form-item label="奖励对象" prop="group_award_object_type">
         <el-select v-model="groupRulesForm.group_award_object_type" placeholder="请选择奖励对象">
           <el-option
             v-for="(op, index) in awardObjectTypeOption"
@@ -252,11 +252,12 @@
         label="团员人数"
         prop="group_people_number"
         class="inputform"
+        required
       >
         <el-input v-model="groupRulesForm.group_people_number"></el-input>
       </el-form-item>
 
-      <el-form-item label="团长奖励发放" prop="captain_award_distribute_type">
+      <el-form-item label="团长奖励发放" prop="captain_award_distribute_type" required>
         <el-select v-model="groupRulesForm.captain_award_distribute_type" placeholder="请选择团长奖励发放">
           <el-option label="拼团成功后发放" value="1"></el-option>
           <el-option label="xxx" value="2"></el-option>
@@ -264,7 +265,7 @@
       </el-form-item>
 
       <span class="partition">团长奖励 Captain Reward</span>
-      <el-form-item label="奖励类型" prop="captain_award_type">
+      <el-form-item label="奖励类型" prop="captain_award_type" required>
         <el-select v-model="groupRulesForm.captain_award_type" placeholder="请选择奖励类型">
           <el-option label="Discount" value="1"></el-option>
           <el-option label="cash" value="2"></el-option>
@@ -272,13 +273,13 @@
           <el-option label="discount" value="4"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="优惠券叠加" prop="captain_coupon_is_overlay">
+      <el-form-item label="优惠券叠加" prop="captain_coupon_is_overlay" required>
         <el-select v-model="groupRulesForm.captain_coupon_is_overlay" placeholder="优惠券是否叠加">
           <el-option label="是" :value="true"></el-option>
           <el-option label="否" :value="false"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="折扣" prop="captain_discount_value" class="rebates-switch">
+      <el-form-item label="折扣" prop="captain_discount_value" class="rebates-switch" required>
         <el-input v-model="groupRulesForm.captain_discount_value" clearable></el-input>
         <el-switch
           v-model="groupRulesForm.captain_discount_unit"
@@ -290,7 +291,7 @@
         </el-switch>
       </el-form-item>
       <span class="partition"> 团员奖励 Member Reward</span>
-      <el-form-item label="奖励类型" prop="member_award_type">
+      <el-form-item label="奖励类型" prop="member_award_type" required>
         <el-select v-model="groupRulesForm.member_award_type" placeholder="请选择团员奖励类型">
           <el-option label="Discount" value="1"></el-option>
           <el-option label="cash" value="2"></el-option>
@@ -298,7 +299,7 @@
           <el-option label="discount" value="4"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="折扣" prop="member_discount_unit" class="rebates-switch">
+      <el-form-item label="折扣" prop="member_discount_unit" class="rebates-switch" required>
         <el-input v-model="groupRulesForm.member_discount_unit" clearable></el-input>
         <el-switch
           v-model="groupRulesForm.captain_discount_unit"
@@ -309,7 +310,7 @@
         >
         </el-switch>
       </el-form-item>
-      <el-form-item label="优惠券叠加" prop="member_coupon_is_overlay">
+      <el-form-item label="优惠券叠加" prop="member_coupon_is_overlay" required>
         <el-select v-model="groupRulesForm.member_coupon_is_overlay" placeholder="优惠券是否叠加">
           <el-option label="是" :value="true"></el-option>
           <el-option label="否" :value="false"></el-option>
@@ -399,7 +400,7 @@ export default {
         recommender_tourists_coupon_code: '',
         recommender_coupon_rule_explain: '',
         recommender_order_threshold_amount: '',
-        recommender_discount_unit: '',
+        recommender_discount_unit: false,
         recommender_discount_value: '',
         recommender_award_sku: '',
         sharer_order_date: '',
@@ -435,7 +436,8 @@ export default {
           { type: 'number', min: 1, message: '数量不能为0', trigger: 'blur' }
         ],
         recommender_order_threshold_amount: [
-          { required: true, message: '请输入订单金额门槛', trigger: 'blur' }
+          { required: true, message: '请输入订单金额门槛', trigger: 'blur' },
+          { type: 'number', min: 1, message: '数量不能为0', trigger: 'blur' }
         ],
         recommender_award_sku: [
           { required: true, message: '请输入商品SKU', trigger: 'change' }
@@ -460,7 +462,9 @@ export default {
         member_coupon_is_overlay: '' // 团员优惠券叠加
       },
       groupRulesRules: {
-
+        group_award_object_type: [
+          { required: true, message: '请选择奖励对象', trigger: 'change' }
+        ]
       }
     }
   },
@@ -492,6 +496,13 @@ export default {
       this.rewardRulesForm.active_type = type
     },
     pushData() {
+      this.rewardRulesForm = {
+        ...this.rewardRulesForm,
+        fission_award_object_type: this.rewardRulesForm.fission_award_object_type * 1,
+        sharer_award_distribute_type: this.rewardRulesForm.sharer_award_distribute_type * 1,
+        recommender_award_type: this.rewardRulesForm.recommender_award_type * 1,
+        recommender_discount_unit: this.rewardRulesForm.recommender_discount_unit ? 1 : 2
+      }
       return this.rewardRulesForm
     },
     getData(data) {
@@ -508,7 +519,7 @@ export default {
           recommender_tourists_coupon_code: data.recommender_tourists_coupon_code,
           recommender_order_threshold_amount: data.recommender_order_threshold_amount,
           recommender_award_sku: data.recommender_award_sku,
-          sharer_order_date: [data.recommender_award_effective_time, data.recommender_award_expired_time]
+          recommender_discount_unit: data.recommender_discount_unit
         }
         this.awardCountData = data.sharer_award_rules
         this.awardCountData.award_times = `${this.awardCountData.award_times_start} - ${this.awardCountData.award_times_end}`
@@ -517,7 +528,7 @@ export default {
         console.log('this.rewardRulesForm', this.rewardRulesForm)
       } else if (data.active_type === '2') {
         this.groupRulesForm = {
-          active_type: data.active_type,
+          active_type: data.active_type * 1,
           group_award_object_type: data.group_award_object_type,
           group_people_number: data.group_people_number, // 团员人数
           group_skus: data.group_skus, // 开团商品sku

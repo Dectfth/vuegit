@@ -361,6 +361,7 @@ export default {
           console.log('提交')
           // this.active++
           this.DataForm = {
+            active_state: this.DataForm.active_state ? 2 : 1,
             ...this.data_basicForm,
             active_effect_time: this.computedDiffTimeZoneDate(this.data_basicForm.activityTime[0], this.data_basicForm.active_time_zone) / 1000,
             active_expired_time: this.computedDiffTimeZoneDate(this.data_basicForm.activityTime[1], this.data_basicForm.active_time_zone) / 1000,
@@ -378,9 +379,10 @@ export default {
           addActive(this.DataForm).then(() => {
             this.$message({
               type: 'success',
-              message: '修改成功'
+              message: '创建成功'
             })
             this.dialogVisible = false
+            location.reload()
           })
         } else {
           console.log('表单LimitNoticeForm验证失败')

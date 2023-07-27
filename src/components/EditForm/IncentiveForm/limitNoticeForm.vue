@@ -242,7 +242,30 @@ export default {
         finish_notify_template_name: ''
       },
       grouplimitNoticeRules: {
-
+        user_limit: [
+          { required: true, message: '请至少选择一种用户类型', trigger: 'blur' }
+        ],
+        return_limit: [
+          { required: true, message: '请至少选择一种用户类型', trigger: 'blur' }
+        ],
+        join_notify_object: [
+          { required: true, message: '请至少选择一个参与通知', trigger: 'change' }
+        ],
+        join_notify_template_name: [
+          { required: true, message: '请至少选择一个邮件模板', trigger: 'change' }
+        ],
+        progress_notify_object: [
+          { required: true, message: '请至少选择一个进度通知', trigger: 'change' }
+        ],
+        progress_notify_template_name: [
+          { required: true, message: '请至少选择一个邮件模板', trigger: 'change' }
+        ],
+        finish_notify_object: [
+          { required: true, message: '请至少选择一个进度通知', trigger: 'change' }
+        ],
+        finish_notify_template_name: [
+          { required: true, message: '请至少选择一个邮件模板', trigger: 'change' }
+        ]
       }
     }
   },
@@ -276,6 +299,15 @@ export default {
       this.grouplimitNoticeForm.active_type = type
     },
     pushData() {
+      this.limitNoticeForm = {
+        ...this.limitNoticeForm,
+        active_type: this.limitNoticeForm.active_type * 1,
+        is_award_audit: this.limitNoticeForm.is_award_audit * 1,
+        user_limit: this.limitNoticeForm.user_limit * 1,
+        join_notify_object: this.limitNoticeForm.join_notify_object * 1,
+        progress_notify_object: this.limitNoticeForm.progress_notify_object * 1,
+        finish_notify_object: this.limitNoticeForm.finish_notify_object * 1
+      }
       return this.limitNoticeForm
     },
     getData(data) {

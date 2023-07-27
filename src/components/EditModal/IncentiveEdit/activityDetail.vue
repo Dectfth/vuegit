@@ -66,6 +66,7 @@
             label="活动节点"
             prop="parent_id"
             class="inputform"
+            required
           >
             <el-input v-model="configform.parent_id"></el-input>
           </el-form-item>
@@ -79,8 +80,8 @@
 
           <el-form-item label="活动类型" prop="active_type">
             <el-select v-model="configform.active_type" placeholder="请选择活动类型">
-              <el-option label="购后裂变" value="1"></el-option>
-              <el-option label="开团" value="2"></el-option>
+              <el-option label="购后裂变" :value="1"></el-option>
+              <el-option label="开团" :value="2"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item
@@ -112,32 +113,22 @@
           </el-form-item>
           <div v-if="configform.active_type !== '2'">
             <div class="model-label">推荐者Referrer</div>
-
             <el-form-item
               label="前置订单限制"
               prop="sharer_before_order_limit"
               class="inputform"
+              required
             >
               <div class="flexClass">
                 <!-- <el-input v-model="configform.orderlimit"></el-input> -->
-                <el-select
-                  v-model="configform.sharer_before_order_limit"
-                  filterable
-                  placeholder="请选择"
-                >
-                  <template v-for="(list,index) in orderlimitList">
-                    <el-option
-                      v-if="list.name"
-                      :key="index"
-                      :label="list.name"
-                      :value="list.id"
-                    >
-                    </el-option>
-                  </template>
+
+                <el-select v-model="configform.sharer_before_order_limit" placeholder="请选择活动类型">
+                  <el-option label="是" :value="true"></el-option>
+                  <el-option label="否" :value="false"></el-option>
                 </el-select>
 
                 <el-checkbox-group
-                  v-if="configform.sharer_before_order_limit == 1"
+                  v-if="configform.sharer_before_order_limit"
                   v-model="configform.orderlimitOption "
                   style="padding: 0px 15px;"
                   @change="getorderlimitOption"
@@ -164,6 +155,7 @@
             </el-form-item>
             <el-form-item
               v-if="configform.orderlimitOption.includes('sharer_sku') && configform.sharer_before_order_limit"
+              required
               label="商品SKU"
               prop="sharer_sku"
               class="inputform"
@@ -171,16 +163,17 @@
               <el-input v-model="configform.sharer_sku"></el-input>
             </el-form-item>
 
-            <el-form-item v-if="configform.orderlimitOption.includes('sharer_quantity') && configform.sharer_before_order_limit" label="件数" prop="sharer_quantity" class="inputform">
+            <el-form-item v-if="configform.orderlimitOption.includes('sharer_quantity') && configform.sharer_before_order_limit" label="件数" prop="sharer_quantity" class="inputform" required>
               <el-input v-model="configform.sharer_quantity"></el-input>
             </el-form-item>
-            <el-form-item v-if="configform.orderlimitOption.includes('sharer_amount') && configform.sharer_before_order_limit" label="金额" prop="sharer_amount" class="inputform">
+            <el-form-item v-if="configform.orderlimitOption.includes('sharer_amount') && configform.sharer_before_order_limit" label="金额" prop="sharer_amount" class="inputform" required>
               <el-input v-model="configform.sharer_amount"></el-input>
             </el-form-item>
 
             <div class="model-label">被推荐者Referral</div>
             <el-form-item
               label="含推荐者自身"
+              required
               prop="recommender_contains_self"
               class="inputform"
             >
@@ -197,6 +190,7 @@
               label="参与次数"
               prop="recommender_join_times"
               class="inputform"
+              required
             >
               <el-input v-model="configform.recommender_join_times"></el-input>
             </el-form-item>
@@ -204,6 +198,7 @@
               label="目标商品限制"
               prop="recommender_sku"
               class="inputform"
+              required
             >
               <el-input v-model="configform.recommender_sku"></el-input>
             </el-form-item>
@@ -211,6 +206,7 @@
               label="下单时间"
               prop="recommender_order_date"
               class="inputform"
+              required
             >
               <el-input v-model="configform.recommender_order_date"></el-input>
             </el-form-item>
@@ -339,10 +335,6 @@ export default {
       },
       limitshow: true, // orderlimit 控制显隐 接口再写
 
-      orderlimitList: [
-        { id: 0, name: '否' },
-        { id: 1, name: '是' }
-      ],
       configformrules: {
         node: [
           { required: true, message: '请输入内容', trigger: 'blur' }
@@ -450,7 +442,6 @@ export default {
       const {
         active_effect_time,
         active_expired_time,
-        sharer_before_order_limit,
         recommender_contains_self,
         sharer_order_date,
         sharer_sku,
@@ -460,9 +451,10 @@ export default {
       } = data
       this.configform = Object.assign(this.configform,
         {
-
-          active_during_time: [active_effect_time, active_expired_time],
-          sharer_before_order_limit: sharer_before_order_limit ? '是' : '否',
+          sharer_sku: data.sharer_sku,
+          sharer_quantity: data.sharer_quantity,
+          sharer_amount: data.sharer_amount,
+          active_during_time: [active_effect_time * 1000, active_expired_time * 1000],
           recommender_contains_self: recommender_contains_self ? '是' : '否',
           orderlimitOption: [
             sharer_order_date ? 'sharer_order_date' : '', sharer_sku ? 'sharer_sku' : '', sharer_quantity ? 'sharer_quantity' : '', sharer_amount ? 'sharer_amount' : ''],

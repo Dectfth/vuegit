@@ -8,8 +8,8 @@
     </el-form-item>
     <el-form-item label="活动类型" prop="active_type">
       <el-select v-model="basicForm.active_type" placeholder="请选择活动类型">
-        <el-option label="购后裂变" value="1"></el-option>
-        <el-option label="开团" value="2"></el-option>
+        <el-option label="购后裂变" :value="1"></el-option>
+        <el-option label="开团" :value="2"></el-option>
       </el-select>
     </el-form-item>
     <el-form-item

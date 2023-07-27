@@ -90,7 +90,7 @@
         </el-form-item>
       </div>
     </el-form>
-    <el-form v-if="groupparticipantForm.active_type == '2'" ref="participantForm" :model="groupparticipantForm" :rules="participantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
+    <el-form v-if="groupparticipantForm.active_type == '2'" ref="participantForm" :model="groupparticipantForm" :rules="groupparticipantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
       <span class="partition">团长Captain</span>
       <el-form-item label="预下单限制" prop="captain_before_order_limit" required>
         <el-select v-model="groupparticipantForm.captain_before_order_limit" placeholder="是否前置订单限制" clearable>
@@ -101,15 +101,15 @@
       <div v-if="groupparticipantForm.captain_before_order_limit">
         <el-form-item
           label="开团次数限制"
-          prop=" captain_group_times"
+          prop="captain_group_times"
           class="inputform"
         >
-          <el-input-number v-model="groupparticipantForm.captain_group_times" :min="0" label="描述文字"></el-input-number>
+          <el-input-number v-model="groupparticipantForm.captain_group_times" :min="0"></el-input-number>
         </el-form-item>
 
         <el-form-item
           label="单次购买件数"
-          prop=" captain_single_purchase_quantity"
+          prop="captain_single_purchase_quantity"
           class="inputform"
         >
           <el-input-number v-model="groupparticipantForm.captain_single_purchase_quantity" :min="0"></el-input-number>
@@ -119,7 +119,7 @@
           prop="captain_wait_time_for_group"
           class="inputform"
         >
-          <el-input-number placeholder="请输入内容" :min="0" v-model="groupparticipantForm.captain_wait_time_for_group">
+          <el-input-number v-model="groupparticipantForm.captain_wait_time_for_group" placeholder="请输入内容" :min="0">
           </el-input-number>
           <div>(分钟 Minutes)</div>
         </el-form-item>
@@ -135,15 +135,17 @@
 
         <el-form-item
           label="购买次数限制"
-          prop=" member_purchase_times"
+          prop="member_purchase_times"
           class="inputform"
+          required
         >
           <el-input-number v-model="groupparticipantForm.member_purchase_times" :min="0"></el-input-number>
         </el-form-item>
         <el-form-item
           label="单次购买件数"
-          prop=" member_single_purchase_quantity"
+          prop="member_single_purchase_quantity"
           class="inputform"
+          required
         >
           <el-input-number v-model="groupparticipantForm.member_single_purchase_quantity" :min="0"></el-input-number>
         </el-form-item>
@@ -245,12 +247,22 @@ export default {
         captain_wait_time_for_group: '', // 成团等待时间
         member_single_purchase_quantity: '', // 团员单次购买数量限制
         simulation_group: '', // 模拟成团
-        member_purchase_times:'',
+        member_purchase_times: ''
       },
       groupparticipantRules: {
         sharer_order_date: [
           { required: true, trigger: 'change' }
+        ],
+        captain_group_times: [
+          { required: true, message: '请输入团长开团次数限制' }
+        ],
+        captain_single_purchase_quantity: [
+          { required: true, message: '请输入团长单次购买数量限制', trigger: 'blur' }
+        ],
+        captain_wait_time_for_group: [
+          { required: true, message: '请输入成团等待时间', trigger: 'blur' }
         ]
+
       }
     }
   },
@@ -281,6 +293,11 @@ export default {
       this.participantForm.active_type = type
     },
     pushData() {
+      this.participantForm = {
+        ...this.participantForm,
+        recommender_trigger_event: this.participantForm.recommender_trigger_event * 1,
+        recommender_join_times: this.participantForm.recommender_join_times * 1
+      }
       return this.participantForm
     },
     getData(data) {
@@ -313,13 +330,13 @@ export default {
         } else {
           this.groupparticipantForm = {
             active_type: data.active_type,
-            captain_before_order_limit: '',
-            captain_group_times: '',
-            captain_single_purchase_quantity: '', // 团长单次购买数量限制
-            captain_wait_time_for_group: '', // 成团等待时间
-            member_single_purchase_quantity: '', // 团员单次购买数量限制
-            simulation_group: '', // 模拟成团
-            member_purchase_times:'',
+            captain_before_order_limit: data.active_type,
+            captain_group_times: data.captain_group_times,
+            captain_single_purchase_quantity: data.captain_single_purchase_quantity, // 团长单次购买数量限制
+            captain_wait_time_for_group: data.captain_wait_time_for_group, // 成团等待时间
+            member_single_purchase_quantity: data.member_single_purchase_quantity, // 团员单次购买数量限制
+            simulation_group: data.simulation_group, // 模拟成团
+            member_purchase_times: data.member_purchase_times
           }
         }
         console.log('this.participantForm', this.participantForm)
