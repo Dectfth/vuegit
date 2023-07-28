@@ -41,6 +41,11 @@ export const sharerAwardDistributeType = {
   2: '一次性发放(完成后发放)'
 }
 
+export const awardMatching = {
+  1: '固定金额',
+  2: '商品价格比例'
+}
+
 /**
  * Operation End
  */

@@ -293,6 +293,7 @@ export default {
       if (id) {
         getActive(id).then((res) => {
           console.log('editdata', res)
+          this.DataForm.active_state = res.data.active_state === 2
           this.$refs.BasicForm.getData(res.data)
           this.$refs.ParticipantForm.getData(res.data)
           this.$refs.RewardRulesForm.getData(res.data)
@@ -366,13 +367,13 @@ export default {
             active_effect_time: this.computedDiffTimeZoneDate(this.data_basicForm.activityTime[0], this.data_basicForm.active_time_zone) / 1000,
             active_expired_time: this.computedDiffTimeZoneDate(this.data_basicForm.activityTime[1], this.data_basicForm.active_time_zone) / 1000,
             ...this.data_participantForm,
-            sharer_order_end_date: this.computedDiffTimeZoneDate(this.data_participantForm.sharer_order_date[0], this.data_basicForm.active_time_zone) / 1000,
-            sharer_order_start_date: this.computedDiffTimeZoneDate(this.data_participantForm.sharer_order_date[1], this.data_basicForm.active_time_zone) / 1000,
-            recommender_order_end_date: this.computedDiffTimeZoneDate(this.data_participantForm.recommender_order_date[0], this.data_basicForm.active_time_zone) / 1000,
-            recommender_order_start_date: this.computedDiffTimeZoneDate(this.data_participantForm.recommender_order_date[1], this.data_basicForm.active_time_zone) / 1000,
+            sharer_order_start_date: this.data_participantForm.sharer_order_date ? this.computedDiffTimeZoneDate(this.data_participantForm.sharer_order_date[0], this.data_basicForm.active_time_zone) / 1000 : '',
+            sharer_order_end_date: this.data_participantForm.sharer_order_date ? this.computedDiffTimeZoneDate(this.data_participantForm.sharer_order_date[1], this.data_basicForm.active_time_zone) / 1000 : '',
+            recommender_order_start_date: this.data_participantForm.recommender_order_date ? this.computedDiffTimeZoneDate(this.data_participantForm.recommender_order_date[0], this.data_basicForm.active_time_zone) / 1000 : '',
+            recommender_order_end_date: this.data_participantForm.recommender_order_date ? this.computedDiffTimeZoneDate(this.data_participantForm.recommender_order_date[1], this.data_basicForm.active_time_zone) / 1000 : '',
             ...this.data_rewardRulesForm,
-            recommender_award_effective_time: this.computedDiffTimeZoneDate(this.data_rewardRulesForm.sharer_order_date[0], this.data_basicForm.active_time_zone) / 1000,
-            recommender_award_expired_time: this.computedDiffTimeZoneDate(this.data_rewardRulesForm.sharer_order_date[1], this.data_basicForm.active_time_zone) / 1000,
+            recommender_award_effective_time: this.data_rewardRulesForm.recommender_award_time ? this.computedDiffTimeZoneDate(this.data_rewardRulesForm.recommender_award_time[0], this.data_basicForm.active_time_zone) / 1000 : '',
+            recommender_award_expired_time: this.data_rewardRulesForm.recommender_award_time ? this.computedDiffTimeZoneDate(this.data_rewardRulesForm.recommender_award_time[1], this.data_basicForm.active_time_zone) / 1000 : '',
             ...this.data_limitNoticeForm
           }
           console.log('this.DataForm', this.DataForm)
@@ -382,7 +383,7 @@ export default {
               message: '创建成功'
             })
             this.dialogVisible = false
-            location.reload()
+            this.$emit('child-event')
           })
         } else {
           console.log('表单LimitNoticeForm验证失败')

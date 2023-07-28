@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form v-if="participantForm.active_type == '1'" ref="participantForm" :model="participantForm" :rules="participantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
+    <el-form v-if="active_type == '1' " ref="participantForm" :model="participantForm" :rules="participantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
       <span class="partition">推荐者Referrer</span>
       <el-form-item label="前置订单限制" required class="frontLimit">
         <el-switch v-model="participantForm.sharer_before_order_limit" prop="sharer_before_order_limit" style="margin-right: 5px;"></el-switch>
@@ -90,7 +90,7 @@
         </el-form-item>
       </div>
     </el-form>
-    <el-form v-if="groupparticipantForm.active_type == '2'" ref="participantForm" :model="groupparticipantForm" :rules="groupparticipantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
+    <el-form v-if="active_type == '2' " ref="participantForm" :model="groupparticipantForm" :rules="groupparticipantRules" label-position="left" label-width="130px" class="demo-Form demo-participantForm">
       <span class="partition">团长Captain</span>
       <el-form-item label="预下单限制" prop="captain_before_order_limit" required>
         <el-select v-model="groupparticipantForm.captain_before_order_limit" placeholder="是否前置订单限制" clearable>
@@ -167,11 +167,12 @@
 
 <script>
 import { recommenderTriggerEvent, recommenderJoinTimes } from '@/utils/parameters'
+import dayjs from 'dayjs'
 
 export default {
   data() {
     return {
-
+      active_type: '',
       triggerEventOptions: [],
       recommenderJoinTimesOptions: [],
       participantForm: {
@@ -286,23 +287,32 @@ export default {
     },
     conlog() {
       console.log('participantForm', this.participantForm)
+      console.log('groupparticipantForm', this.groupparticipantForm)
     },
     getActiveType(type) {
       console.log('typepartic', type)
+      this.active_type = type
       this.groupparticipantForm.active_type = type
       this.participantForm.active_type = type
     },
     pushData() {
-      this.participantForm = {
-        ...this.participantForm,
-        recommender_trigger_event: this.participantForm.recommender_trigger_event * 1,
-        recommender_join_times: this.participantForm.recommender_join_times * 1
+      if (this.active_type === 1) {
+        this.participantForm = {
+          ...this.participantForm,
+          recommender_trigger_event: this.participantForm.recommender_trigger_event * 1,
+          recommender_join_times: this.participantForm.recommender_join_times * 1
+        }
+        return this.participantForm
+      } else {
+        this.groupparticipantForm = {
+          ...this.groupparticipantForm
+        }
+        return this.groupparticipantForm
       }
-      return this.participantForm
     },
     getData(data) {
       if (data) {
-        if (data.active_type === '1') {
+        if (data.active_type === 1) {
           this.participantForm = {
             active_type: data.active_type,
             sharer_before_order_limit: data.sharer_before_order_limit,
@@ -313,7 +323,7 @@ export default {
             sharer_sku: data.sharer_sku,
             sharer_quantity: data.sharer_quantity,
             sharer_amount: data.sharer_amount,
-            sharer_order_date: data.sharer_order_date,
+            sharer_order_date: [this.transferDate(data.sharer_order_start_date, data.active_time_zone), this.transferDate(data.sharer_order_end_date, data.active_time_zone)],
             recommender_contains_self: data.recommender_contains_self,
             recommender_order_date_flag: data.recommender_order_date_flag,
             recommender_quantity_flag: data.recommender_quantity_flag,
@@ -325,12 +335,13 @@ export default {
             recommender_sku: data.recommender_sku,
             recommender_quantity: data.recommender_quantity,
             recommender_order_threshold_amount: data.recommender_order_threshold_amount,
-            recommender_order_date: data.recommender_order_date
+            recommender_order_date: [this.transferDate(data.recommender_order_start_date, data.active_time_zone), this.transferDate(data.recommender_order_end_date, data.active_time_zone)]
           }
+          this.active_type = this.participantForm.active_type
         } else {
           this.groupparticipantForm = {
             active_type: data.active_type,
-            captain_before_order_limit: data.active_type,
+            captain_before_order_limit: data.captain_before_order_limit,
             captain_group_times: data.captain_group_times,
             captain_single_purchase_quantity: data.captain_single_purchase_quantity, // 团长单次购买数量限制
             captain_wait_time_for_group: data.captain_wait_time_for_group, // 成团等待时间
@@ -338,9 +349,30 @@ export default {
             simulation_group: data.simulation_group, // 模拟成团
             member_purchase_times: data.member_purchase_times
           }
+          this.active_type = this.groupparticipantForm.active_type
         }
         console.log('this.participantForm', this.participantForm)
+        console.log('this.groupparticipantForm', this.groupparticipantForm)
       }
+    },
+    transferDate(itemTime, active_time_zone) {
+      const currentTimeZone = dayjs().utcOffset() / 60
+      const timezoneUnit = 3600000
+      // 服务器保存的是先减去当前时区再加上时区的时间
+      // 本地显示的是先减去选择的时间再加上当前时区
+      const timeZoneNum = this.getNum(active_time_zone) * -timezoneUnit
+      const currentTimeZoneNum = currentTimeZone * timezoneUnit
+      const transferTime = dayjs(
+        itemTime * 1000 - timeZoneNum + currentTimeZoneNum
+      ).format('YYYY-MM-DD HH:mm:ss')
+      console.log('transferTime', transferTime)
+      return transferTime
+    },
+    // 截取字符串中的数字包含正负号
+    getNum(str) {
+      const reg = /-?\d+/g
+      const res = str.match(reg)
+      return res[0]
     }
   }
 }

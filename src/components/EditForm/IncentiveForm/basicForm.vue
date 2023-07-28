@@ -58,6 +58,7 @@
 </template>
 <script>
 import Tourproduct from '@/components/EditModal/IncentiveEdit/tourproduct.vue'
+import dayjs from 'dayjs'
 
 export default {
   components: {
@@ -255,13 +256,33 @@ export default {
         this.basicForm = {
           parent_id: data.parent_id,
           active_name: data.active_name,
-          activityTime: [data.active_effect_time, data.active_expired_time],
+          activityTime: [this.transferDate(data.active_effect_time, data.active_time_zone), this.transferDate(data.active_expired_time, data.active_time_zone)],
           active_type: data.active_type,
           group_skus: data.group_skus,
           active_time_zone: data.active_time_zone,
+          active_image_url: data.active_image_url,
           active_rule_text: data.active_rule_text
         }
       }
+    },
+    transferDate(itemTime, active_time_zone) {
+      const currentTimeZone = dayjs().utcOffset() / 60
+      const timezoneUnit = 3600000
+      // 服务器保存的是先减去当前时区再加上时区的时间
+      // 本地显示的是先减去选择的时间再加上当前时区
+      const timeZoneNum = this.getNum(active_time_zone) * -timezoneUnit
+      const currentTimeZoneNum = currentTimeZone * timezoneUnit
+      const transferTime = dayjs(
+        itemTime * 1000 - timeZoneNum + currentTimeZoneNum
+      ).format('YYYY-MM-DD HH:mm:ss')
+      console.log('transferTime', transferTime)
+      return transferTime
+    },
+    // 截取字符串中的数字包含正负号
+    getNum(str) {
+      const reg = /-?\d+/g
+      const res = str.match(reg)
+      return res[0]
     }
   }
 }

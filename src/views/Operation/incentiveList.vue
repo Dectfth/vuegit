@@ -82,7 +82,7 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <incentiveCreate ref="editModal" @addSuccess="refreshList" />
+    <incentiveCreate ref="editModal" @addSuccess="refreshList" @child-event="getList" />
     <activityDetail ref="preveModal" @addSuccess="prevRefreshList" />
   </div>
 </template>
@@ -94,6 +94,7 @@ import incentiveCreate from '@/components/EditModal/IncentiveEdit/incentiveCreat
 import activityDetail from '@/components/EditModal/IncentiveEdit/activityDetail.vue'
 import { getActivePages } from '@/api/activities'
 import { changeActiveType, awardObjectType, awardType } from '@/utils/parameters'
+import dayjs from 'dayjs'
 
 export default {
   name: 'IncentiveList',
@@ -110,6 +111,7 @@ export default {
       pageNum: 1,
       total: 1,
       currentValue: -1,
+      active_type: '',
       btn: {
         label: '创建活动',
         type: 'primary',
@@ -142,11 +144,11 @@ export default {
           label: '活动类型'
         },
         {
-          prop: 'fission_award_object_type',
+          prop: 'award_object_type',
           label: '激励方'
         },
         {
-          prop: 'captain_award_type',
+          prop: 'award_type',
           label: '激励类型'
         }
       ],
@@ -186,12 +188,12 @@ export default {
           placeholder: '按活动名称搜索',
           props: 'active_name'
         },
-        {
-          type: 'datetime',
-          label: '生效时间：',
-          placeholder: '选择生效时间',
-          props: 'active_effect_time'
-        },
+        // {
+        //   type: 'datetime',
+        //   label: '生效时间：',
+        //   placeholder: '选择生效时间',
+        //   props: 'active_effect_time'
+        // },
         {
           type: 'button',
           label: '查询',
@@ -225,13 +227,31 @@ export default {
         this.loading = false
         this.tableData = data.res.list
         this.total = data.res.totalCount
+        const currentTimeZone = dayjs().utcOffset() / 60
+        const timezoneUnit = 3600000
+        // 服务器保存的是先减去当前时区再加上时区的时间
+        // 本地显示的是先减去选择的时间再加上当前时区
         this.tableData.forEach((item) => {
-          item.active_state = item.active_state * 1
-          item.active_type = changeActiveType[(item.active_type * 1)]
-          item.fission_award_object_type = awardObjectType[(item.fission_award_object_type * 1)]
-          item.captain_award_type = awardType[(item.captain_award_type * 1)]
+          const timeZoneNum = this.getNum(item.active_time_zone) * -timezoneUnit
+          const currentTimeZoneNum = currentTimeZone * timezoneUnit
+          this.active_type = item.active_type
+          item.active_type = changeActiveType[(item.active_type)]
+          item.award_object_type = this.active_type === 1 ? awardObjectType[(item.fission_award_object_type)] : awardObjectType[(item.group_award_object_type)]
+          item.award_type = this.active_type === 1 ? awardType[(item.recommender_award_type)] : awardType[(item.captain_award_type)]
+          item.active_effect_time = dayjs(
+            item.active_effect_time * 1000 - timeZoneNum + currentTimeZoneNum
+          ).format('YYYY-MM-DD HH:mm:ss') // 先换算为0时区的时间，再加上时区的时
+          item.active_expired_time = dayjs(
+            item.active_expired_time * 1000 - timeZoneNum + currentTimeZone
+          ).format('YYYY-MM-DD HH:mm:ss')
         })
       })
+    },
+    // 截取字符串中的数字包含正负号
+    getNum(str) {
+      const reg = /-?\d+/g
+      const res = str.match(reg)
+      return res[0]
     },
     refreshList() {
 
@@ -240,6 +260,7 @@ export default {
       this.$refs.editModal.edit(id)
     },
     selectStatus(value) {
+      this.currentValue = value
       this.searchData.active_state = value
       this.getList()
     },

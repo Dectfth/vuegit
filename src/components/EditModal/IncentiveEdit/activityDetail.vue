@@ -105,13 +105,21 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item
+            required
             label="活动时区"
             prop="active_time_zone"
             class="inputform"
           >
             <el-input v-model="configform.active_time_zone"></el-input>
           </el-form-item>
-          <div v-if="configform.active_type !== '2'">
+          <el-form-item label="活动图片链接（个人中心）" prop="active_image_url" required>
+            <el-input v-model="configform.active_image_url" clearable></el-input>
+            <span style="font-size:12px;color:#EEEEEE;">*图片尺寸比例为1：1，重要文字信息居中显示（M端会进行裁切）</span>
+          </el-form-item>
+          <el-form-item label="活动规则" prop="active_rule_text" required>
+            <el-input v-model="configform.active_rule_text" clearable></el-input>
+          </el-form-item>
+          <div v-if="configform.active_type == '1'">
             <div class="model-label">推荐者Referrer</div>
             <el-form-item
               label="前置订单限制"
@@ -126,35 +134,27 @@
                   <el-option label="是" :value="true"></el-option>
                   <el-option label="否" :value="false"></el-option>
                 </el-select>
-
-                <el-checkbox-group
-                  v-if="configform.sharer_before_order_limit"
-                  v-model="configform.orderlimitOption "
-                  style="padding: 0px 15px;"
-                  @change="getorderlimitOption"
-                >
-                  <el-checkbox
-                    v-for="item in orderlimitOptions"
-                    :key="item.key"
-                    :label="item.key"
-                    class="checkbox"
-                    size="medium"
-                  >
-                    {{ item.name }}
-                  </el-checkbox>
-                </el-checkbox-group>
+                <div v-if="configform.sharer_before_order_limit" style="margin-left: 20px;">
+                  <el-checkbox v-model="configform.sharer_order_date_flag" label="时间"></el-checkbox>
+                  <el-checkbox v-model="configform.sharer_sku_flag" label="商品"></el-checkbox>
+                  <el-checkbox v-model="configform.sharer_quantity_flag" label="件数"></el-checkbox>
+                  <el-checkbox v-model="configform.sharer_amount_flag" label="金额"></el-checkbox>
+                </div>
               </div>
             </el-form-item>
-            <el-form-item v-if="configform.orderlimitOption.includes('sharer_order_date') && configform.sharer_before_order_limit" label="下单时间" required class="inputform">
+            <el-form-item v-if="configform.sharer_order_date_flag && configform.sharer_before_order_limit" label="下单时间" required class="inputform">
               <el-date-picker
                 v-model="configform.sharer_order_date"
-                type="datetime"
-                placeholder="选择日期时间"
+                type="datetimerange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right"
               >
               </el-date-picker>
             </el-form-item>
             <el-form-item
-              v-if="configform.orderlimitOption.includes('sharer_sku') && configform.sharer_before_order_limit"
+              v-if="configform.sharer_sku_flag && configform.sharer_before_order_limit"
               required
               label="商品SKU"
               prop="sharer_sku"
@@ -163,10 +163,10 @@
               <el-input v-model="configform.sharer_sku"></el-input>
             </el-form-item>
 
-            <el-form-item v-if="configform.orderlimitOption.includes('sharer_quantity') && configform.sharer_before_order_limit" label="件数" prop="sharer_quantity" class="inputform" required>
+            <el-form-item v-if="configform.sharer_quantity_flag && configform.sharer_before_order_limit" label="件数" prop="sharer_quantity" class="inputform" required>
               <el-input v-model="configform.sharer_quantity"></el-input>
             </el-form-item>
-            <el-form-item v-if="configform.orderlimitOption.includes('sharer_amount') && configform.sharer_before_order_limit" label="金额" prop="sharer_amount" class="inputform" required>
+            <el-form-item v-if="configform.sharer_amount_flag && configform.sharer_before_order_limit" label="金额" prop="sharer_amount" class="inputform" required>
               <el-input v-model="configform.sharer_amount"></el-input>
             </el-form-item>
 
@@ -179,20 +179,25 @@
             >
               <el-input v-model="configform.recommender_contains_self"></el-input>
             </el-form-item>
-            <el-form-item
-              label="触发动作"
-              prop="recommender_trigger_event"
-              class="inputform"
-            >
-              <el-input v-model="configform.recommender_trigger_event"></el-input>
+            <el-form-item label="触发动作" prop="recommender_trigger_event" required>
+              <el-select v-model="configform.recommender_trigger_event" placeholder="请选择触发动作">
+                <el-option
+                  v-for="(op, index) in triggerEventOptions"
+                  :key="index"
+                  :label="op.label"
+                  :value="op.value"
+                />
+              </el-select>
             </el-form-item>
-            <el-form-item
-              label="参与次数"
-              prop="recommender_join_times"
-              class="inputform"
-              required
-            >
-              <el-input v-model="configform.recommender_join_times"></el-input>
+            <el-form-item label="参与次数" prop="recommender_join_times">
+              <el-select v-model="configform.recommender_join_times" placeholder="请选择参与次数">
+                <el-option
+                  v-for="(op, index) in recommenderJoinTimesOptions"
+                  :key="index"
+                  :label="op.label"
+                  :value="op.value"
+                />
+              </el-select>
             </el-form-item>
             <el-form-item
               label="目标商品限制"
@@ -202,13 +207,15 @@
             >
               <el-input v-model="configform.recommender_sku"></el-input>
             </el-form-item>
-            <el-form-item
-              label="下单时间"
-              prop="recommender_order_date"
-              class="inputform"
-              required
-            >
-              <el-input v-model="configform.recommender_order_date"></el-input>
+            <el-form-item v-if="configform.recommender_order_date_flag" label="下单时间" prop="recommender_order_date">
+              <el-date-picker
+                v-model="configform.recommender_order_date"
+                type="datetimerange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+              >
+              </el-date-picker>
             </el-form-item>
             <el-form-item
               label="商品SKU"
@@ -227,7 +234,10 @@
         label="操作记录"
         name="2"
       >
-        <div class="flexcenter"><div class="model-header">活动记录 <div class="model-label">用户 / 系统</div></div><div class="export-records">导出记录</div> </div>
+        <div class="flexcenter"><div class="model-header">活动记录 <div class="model-label">用户 / 系统</div></div>
+          <div class="export-records" @click="exportact(configform.id)">导出记录</div>
+        </div>
+
         <el-table
           :data="recordsData"
           style="width: 100%"
@@ -286,6 +296,8 @@ import DateInput from './dateinput.vue'
 import RewardRulesForm from '@/components/EditForm/IncentiveForm/rewardRulesForm.vue'
 import LimitNoticeForm from '@/components/EditForm/IncentiveForm/limitNoticeForm.vue'
 import Tourproduct from '@/components/EditModal/IncentiveEdit/tourproduct.vue'
+import { recommenderTriggerEvent, recommenderJoinTimes } from '@/utils/parameters'
+import { exportActiveLogDetail } from '@/api/activities'
 
 import {
   getActiveLink,
@@ -302,9 +314,9 @@ export default {
   },
   data() {
     return {
-      recordsData: [
-
-      ],
+      triggerEventOptions: [],
+      recommenderJoinTimesOptions: [],
+      recordsData: [],
       statisticalList: [], //
       modalTitle: '',
       dialogVisible: false,
@@ -321,10 +333,17 @@ export default {
         active_name: '', // 名称
         active_type: '', // 活动类型
         active_during_time: '', // 活动生效时间
+        active_time_zone: '', // 活动时区
+        active_image_url: '', // 活动imgurl
+        active_rule_text: '', // 活动规则
         sharer_before_order_limit: '', // 分享者前置订单限制
-        sharer_order_date: '', // 分享者下单时间
+        sharer_order_date_flag: '', // 被分享者下单时间标志
+        sharer_order_date: '', // 分享者下单时间 sharer_order_end_date
+        sharer_sku_flag: '',
         sharer_sku: '', // 分享者商品SKU
+        sharer_amount_flag: '',
         sharer_amount: '', // 分享者商品金额限制
+        sharer_quantity_flag: '',
         sharer_quantity: '', // 分享者商品数量限制
         orderlimitOption: [],
         recommender_contains_self: '', // 被分享者是否前含推荐者自身限制 0:否|1:是
@@ -389,23 +408,26 @@ export default {
     }
   },
   computed: {
-    orderlimitOptions() {
-      const options = [
-        { key: 'sharer_order_date', name: '下单时间' },
-        { key: 'sharer_sku', name: '商品SKU' },
-        { key: 'sharer_quantity', name: '件数' },
-        { key: 'sharer_amount', name: '金额' }
-      ]
-      if (this.configform.sharer_before_order_limit) {
-        return options
-      } else {
-        return []
-      }
-    }
+
   },
   mounted() {
+    this.init()
   },
   methods: {
+    init() {
+      this.triggerEventOptions = this.initOptions(recommenderTriggerEvent)
+      this.recommenderJoinTimesOptions = this.initOptions(recommenderJoinTimes)
+    },
+    initOptions(El) {
+      const outputEL = Object.keys(El).map((key) => {
+        const value = El[key]
+        return {
+          label: value,
+          value: key * 1
+        }
+      })
+      return outputEL
+    },
     addTag(tag) {
       this.configform.group_skus.push(tag)
     },
@@ -443,21 +465,18 @@ export default {
         active_effect_time,
         active_expired_time,
         recommender_contains_self,
-        sharer_order_date,
-        sharer_sku,
-        sharer_quantity,
-        sharer_amount,
+        sharer_order_end_date,
+        sharer_order_start_date,
+        recommender_order_start_date,
+        recommender_order_end_date,
         ...rest
       } = data
       this.configform = Object.assign(this.configform,
         {
-          sharer_sku: data.sharer_sku,
-          sharer_quantity: data.sharer_quantity,
-          sharer_amount: data.sharer_amount,
           active_during_time: [active_effect_time * 1000, active_expired_time * 1000],
           recommender_contains_self: recommender_contains_self ? '是' : '否',
-          orderlimitOption: [
-            sharer_order_date ? 'sharer_order_date' : '', sharer_sku ? 'sharer_sku' : '', sharer_quantity ? 'sharer_quantity' : '', sharer_amount ? 'sharer_amount' : ''],
+          sharer_order_date: [sharer_order_start_date * 1000, sharer_order_end_date * 1000],
+          recommender_order_date: [recommender_order_start_date * 1000, recommender_order_end_date * 1000],
           ...rest
         }
       )
@@ -481,6 +500,7 @@ export default {
         isEdit: true
       }
       this.$emit('addSuccess', params)
+      this.dialogVisible = false
     },
     handleClose(done) {
       this.$confirm('确认关闭？')
@@ -492,6 +512,20 @@ export default {
     },
     getorderlimitOption(aa) {
       console.log(aa, 'a')
+    },
+    exportact(id) {
+      console.log(id, '............id')
+      exportActiveLogDetail(id).then((data) => {
+        const { res } = data
+        const blob = new Blob([res], { type: 'application/vnd.ms-excel;chartset=utf-8' })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'DTC操作记录.xlsx' // 指定下载文件名为.xlsx格式
+        document.body.appendChild(link)
+        link.click()
+        URL.revokeObjectURL(url)
+      })
     }
   }
 }

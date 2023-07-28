@@ -90,7 +90,7 @@
 import FilterTool from '@/components/Common/FilterTool.vue'
 import TabList from '@/components/Common/TabList.vue'
 import vettingDetail from '@/components/EditModal/IncentiveEdit/vettingDetail.vue'
-import { getActiveLinkUser } from '@/api/activities'
+import { getActiveLinkUser , getApprovalRewards} from '@/api/activities'
 import { awardObjectType } from '@/utils/parameters'
 export default {
   name: 'ActivitylinkList',
@@ -145,34 +145,29 @@ export default {
           width: 60
         },
         {
-          prop: 'user_role',
+          prop: 'identityType',
           label: '用户身份',
           width: 100
         },
         {
-          prop: 'user_email',
+          prop: 'sharerEmail',
           label: '用户邮箱'
         },
         {
-          prop: 'incentive_action',
-          label: '激励动作'
-
-        },
-        {
-          prop: 'incentive_type',
+          prop: 'incentiveType',
           label: '激励类型'
         },
         {
-          prop: 'incentive_state',
+          prop: 'rewardStatus',
           label: '状态'
         },
         {
-          prop: 'incentive_value',
+          prop: 'rewardNum',
           label: '数量',
           width: 80
         },
         {
-          prop: 'update_time',
+          prop: 'updatedTime',
           label: '最后更新'
         }
       ],
@@ -182,7 +177,7 @@ export default {
       formData: {},
       // ===========
       rolelist: [],
-      activetype: [{ label: 'Cash', value: 'Cash' }, { label: 'Credit', value: 'Credit' }]
+      activetype: [{ label: 'Credit', value: 1 }, { label: 'Cash', value: 2 }, { label: 'coupon', value: 3 }, { label: 'discount', value: 4 }]
     }
   },
   computed: {
@@ -199,13 +194,13 @@ export default {
           type: 'input',
           label: '用户邮箱：',
           placeholder: '请输入',
-          props: 'user_email'
+          props: 'userEmail'
         },
         {
           type: 'select',
           label: '激励类型：',
           placeholder: '全部',
-          props: 'active',
+          props: 'rewardType',
           options: this.activetype
         },
         {
@@ -243,15 +238,15 @@ export default {
     getList() {
       this.loading = true
       const params = {
-        active_id: this.$route.params.id,
-        pageSize: this.pageSize,
-        pageNum: this.currentPage,
-        user_email: this.formData.user_email || '', // filter
-        user_role: this.formData.user_role || '',
-        incentive_type: this.formData.incentive_type || '',
-        incentive_state: this.currentValue < 0 ? '' : this.currentValue
+        activeId: this.$route.params.id,
+        page: this.currentPage,
+        size: this.pageSize,
+        userEmail: this.formData.user_email || undefined, // filter
+        user_role: this.formData.user_role || undefined,
+        incentive_type: this.formData.incentive_type || undefined,
+        rewardState: this.currentValue < 0 ? undefined : this.currentValue
       }
-      getActiveLinkUser(params)
+      getApprovalRewards(params)
         .then((data) => {
           const roleMap = new Map([
             ['1', '推荐者'],
@@ -266,10 +261,10 @@ export default {
             ['5', '已删除']
           ])
           const { res } = data
-          this.tableData = res.list.map(({ user_role, incentive_state, ...rest }) => {
+          this.tableData = res.list.map(({ user_role, rewardState, ...rest }) => {
             return {
               user_role: roleMap.get(user_role),
-              incentive_state: statusMap.get(incentive_state),
+              rewardState: statusMap.get(rewardState),
               ...rest
             }
           })

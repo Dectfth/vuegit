@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-form v-if="limitNoticeForm.active_type == '1'" ref="limitNoticeForm" :model="limitNoticeForm" :rules="limitNoticeRules" label-position="left" label-width="130px" class="demo-Form demo-limitNoticeForm">
+
+    <el-form v-if="active_type == 1 " ref="limitNoticeForm" :model="limitNoticeForm" :rules="limitNoticeRules" label-position="left" label-width="130px" class="demo-Form demo-limitNoticeForm">
       <span class="partition">限制</span>
       <el-form-item label="奖励审批" prop="is_award_audit">
         <el-select v-model="limitNoticeForm.is_award_audit" placeholder="请选择奖励审批" clearable>
@@ -10,8 +11,8 @@
       </el-form-item>
       <el-form-item label="参与用户限制" prop="user_limit">
         <el-select v-model="limitNoticeForm.user_limit" placeholder="请选择参与用户限制" clearable>
-          <el-option label="注册用户" value="1"></el-option>
-          <el-option label="游客" value="2"></el-option>
+          <el-option label="注册用户" :value="1"></el-option>
+          <el-option label="游客" :value="2"></el-option>
         </el-select>
       </el-form-item>
 
@@ -19,10 +20,10 @@
       <div class="EmailNotice">
         <el-form-item label="参与通知" prop="join_notify_object">
           <el-select v-model="limitNoticeForm.join_notify_object" placeholder="请选择参与通知" clearable>
-            <el-option label="是（双方）" value="1"></el-option>
-            <el-option label="是（仅分享者）" value="2"></el-option>
-            <el-option label="是（仅被分享者）" value="3"></el-option>
-            <el-option label="否" value="0"></el-option>
+            <el-option label="是（双方）" :value="1"></el-option>
+            <el-option label="是（仅分享者）" :value="2"></el-option>
+            <el-option label="是（仅被分享者）" :value="3"></el-option>
+            <el-option label="否" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="limitNoticeForm.join_notify_object > 0" prop="join_notify_template_name">
@@ -41,10 +42,10 @@
       <div class="EmailNotice">
         <el-form-item label="进度通知" prop="progress_notify_object">
           <el-select v-model="limitNoticeForm.progress_notify_object" placeholder="请选择进度通知" clearable>
-            <el-option label="推荐方" value="1"></el-option>
-            <el-option label="被推荐方" value="2"></el-option>
-            <el-option label="双方" value="3"></el-option>
-            <el-option label="无" value="0"></el-option>
+            <el-option label="推荐方" :value="1"></el-option>
+            <el-option label="被推荐方" :value="2"></el-option>
+            <el-option label="双方" :value="3"></el-option>
+            <el-option label="无" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="limitNoticeForm.progress_notify_object > 0" prop="progress_notify_template_name">
@@ -63,10 +64,10 @@
       <div class="EmailNotice">
         <el-form-item label="完成通知" prop="finish_notify_object">
           <el-select v-model="limitNoticeForm.finish_notify_object" placeholder="请选择完成通知" clearable>
-            <el-option label="推荐方" value="1"></el-option>
-            <el-option label="被推荐方" value="2"></el-option>
-            <el-option label="双方" value="3"></el-option>
-            <el-option label="否" value="0"></el-option>
+            <el-option label="推荐方" :value="1"></el-option>
+            <el-option label="被推荐方" :value="2"></el-option>
+            <el-option label="双方" :value="3"></el-option>
+            <el-option label="否" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="limitNoticeForm.finish_notify_object > 0" prop="finish_notify_template_name">
@@ -87,29 +88,29 @@
       <el-input v-model="limitNoticeForm.completion" disabled clearable></el-input>
     </el-form-item> -->
     </el-form>
-    <el-form v-if="grouplimitNoticeForm.active_type == '2'" ref="limitNoticeForm" :model="grouplimitNoticeForm" :rules="grouplimitNoticeRules" label-position="left" label-width="130px" class="demo-Form demo-limitNoticeForm">
+    <el-form v-if="active_type == 2 " ref="limitNoticeForm" :model="grouplimitNoticeForm" :rules="grouplimitNoticeRules" label-position="left" label-width="130px" class="demo-Form demo-limitNoticeForm">
       <span class="partition">成团限制</span>
       <el-form-item label="参与用户限制" prop="user_limit">
         <el-select v-model="grouplimitNoticeForm.user_limit" placeholder="请选择参与用户限制" clearable>
-          <el-option label="注册用户" value="1"></el-option>
-          <el-option label="游客" value="2"></el-option>
+          <el-option label="注册用户" :value="1"></el-option>
+          <el-option label="游客" :value="2"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="退换货限制" prop="return_limit">
         <el-select v-model="grouplimitNoticeForm.return_limit" placeholder="请选择参与用户限制" clearable>
-          <el-option label="不可退换货" value="0"></el-option>
-          <el-option label="可以换货" value="1"></el-option>
-          <el-option label="可以退货" value="2"></el-option>
+          <el-option label="不可退换货" :value="0"></el-option>
+          <el-option label="可以换货" :value="1"></el-option>
+          <el-option label="可以退货" :value="2"></el-option>
         </el-select>
       </el-form-item>
       <span class="partition">通知</span>
       <div class="EmailNotice">
         <el-form-item label="参与通知" prop="join_notify_object">
           <el-select v-model="grouplimitNoticeForm.join_notify_object" placeholder="请选择参与通知" clearable>
-            <el-option label="是（双方）" value="1"></el-option>
-            <el-option label="是（仅分享者）" value="2"></el-option>
-            <el-option label="是（仅被分享者）" value="3"></el-option>
-            <el-option label="否" value="0"></el-option>
+            <el-option label="是（双方）" :value="1"></el-option>
+            <el-option label="是（仅分享者）" :value="2"></el-option>
+            <el-option label="是（仅被分享者）" :value="3"></el-option>
+            <el-option label="否" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="grouplimitNoticeForm.join_notify_object > 0" prop="join_notify_template_name">
@@ -128,10 +129,10 @@
       <div class="EmailNotice">
         <el-form-item label="进度通知" prop="progress_notify_object">
           <el-select v-model="grouplimitNoticeForm.progress_notify_object" placeholder="请选择进度通知" clearable>
-            <el-option label="推荐方" value="1"></el-option>
-            <el-option label="被推荐方" value="2"></el-option>
-            <el-option label="双方" value="3"></el-option>
-            <el-option label="无" value="0"></el-option>
+            <el-option label="推荐方" :value="1"></el-option>
+            <el-option label="被推荐方" :value="2"></el-option>
+            <el-option label="双方" :value="3"></el-option>
+            <el-option label="无" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="grouplimitNoticeForm.progress_notify_object > 0" prop="progress_notify_template_name">
@@ -150,10 +151,10 @@
       <div class="EmailNotice">
         <el-form-item label="完成通知" prop="finish_notify_object">
           <el-select v-model="grouplimitNoticeForm.finish_notify_object" placeholder="请选择完成通知" clearable>
-            <el-option label="推荐方" value="1"></el-option>
-            <el-option label="被推荐方" value="2"></el-option>
-            <el-option label="双方" value="3"></el-option>
-            <el-option label="否" value="0"></el-option>
+            <el-option label="推荐方" :value="1"></el-option>
+            <el-option label="被推荐方" :value="2"></el-option>
+            <el-option label="双方" :value="3"></el-option>
+            <el-option label="否" :value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="grouplimitNoticeForm.finish_notify_object > 0" prop="finish_notify_template_name">
@@ -179,16 +180,8 @@ import { getEmailTemplatelist } from '@/api/emailTemplate'
 export default {
   data() {
     return {
-      participationEmail: [
-        {
-          label: 'Email_SSM_JOIN_Default_1',
-          value: 'Email_SSM_JOIN_Default_1'
-        },
-        {
-          label: 'Email_SSM_JOIN_Default_2',
-          value: 'Email_SSM_JOIN_Default_2'
-        }
-      ],
+      active_type: '',
+      participationEmail: [],
       limitNoticeForm: {
         active_type: '',
         is_award_audit: '',
@@ -295,24 +288,39 @@ export default {
     getActiveType(type) {
       console.log('type', type)
       console.log('type0000', type)
+      this.active_type = type
       this.limitNoticeForm.active_type = type
       this.grouplimitNoticeForm.active_type = type
     },
     pushData() {
-      this.limitNoticeForm = {
-        ...this.limitNoticeForm,
-        active_type: this.limitNoticeForm.active_type * 1,
-        is_award_audit: this.limitNoticeForm.is_award_audit * 1,
-        user_limit: this.limitNoticeForm.user_limit * 1,
-        join_notify_object: this.limitNoticeForm.join_notify_object * 1,
-        progress_notify_object: this.limitNoticeForm.progress_notify_object * 1,
-        finish_notify_object: this.limitNoticeForm.finish_notify_object * 1
+      if (this.active_type === 1) {
+        this.limitNoticeForm = {
+          ...this.limitNoticeForm
+          // active_type: this.limitNoticeForm.active_type * 1,
+          // is_award_audit: this.limitNoticeForm.is_award_audit * 1,
+          // user_limit: this.limitNoticeForm.user_limit * 1,
+          // join_notify_object: this.limitNoticeForm.join_notify_object * 1,
+          // progress_notify_object: this.limitNoticeForm.progress_notify_object * 1,
+          // finish_notify_object: this.limitNoticeForm.finish_notify_object * 1
+        }
+        return this.limitNoticeForm
+      } else {
+        this.grouplimitNoticeForm = {
+          ...this.grouplimitNoticeForm
+          // active_type: this.grouplimitNoticeForm.active_type * 1,
+          // return_limit: this.grouplimitNoticeForm.return_limit * 1,
+          // user_limit: this.grouplimitNoticeForm.user_limit * 1,
+          // join_notify_object: this.grouplimitNoticeForm.join_notify_object * 1,
+          // progress_notify_object: this.grouplimitNoticeForm.progress_notify_object * 1,
+          // finish_notify_object: this.grouplimitNoticeForm.finish_notify_object * 1
+        }
+        return this.grouplimitNoticeForm
       }
-      return this.limitNoticeForm
     },
     getData(data) {
+      console.log(data, '.........data')
       if (!data) return
-      if (data.active_type === '1') {
+      if (data.active_type === 1) {
         this.limitNoticeForm = {
         // ...data
           active_type: data.active_type,
@@ -328,7 +336,6 @@ export default {
         console.log(this.limitNoticeForm, '.this.limitNoticeForm')
       } else {
         this.grouplimitNoticeForm = {
-
           active_type: data.active_type,
           user_limit: data.user_limit,
           return_limit: data.return_limit,
@@ -341,6 +348,7 @@ export default {
         }
         console.log(this.grouplimitNoticeForm, '.this.grouplimitNoticeForm')
       }
+      this.active_type = data.active_type
     }
   }
 }

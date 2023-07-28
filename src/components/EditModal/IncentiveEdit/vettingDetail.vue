@@ -92,8 +92,8 @@ export default {
       dialogVisible: false,
       form: {
         // active: false
-        user_role: '', // 用户角色，1推荐者2被推荐者3双反
-        user_email: '', // * 用户邮箱：
+        identityType: '', // 用户角色，1推荐者2被推荐者3双反
+        userEmail: '', // * 用户邮箱：
         incentive_action: '', // * 激励动作：
         incentive_type: '', // * 激励类型：
         incentive_value: '', // * 激励的次数或金额或其他
@@ -116,8 +116,8 @@ export default {
       if (row) {
         this.form = {
           ...this.form,
-          user_role: row.user_role, // 用户角色，1推荐者2被推荐者3双反
-          user_email: row.user_email, // * 用户邮箱：
+          identityType: row.identityType, // 用户角色，1推荐者2被推荐者3双反
+          userEmail: row.userEmail, // * 用户邮箱：
           incentive_action: row.incentive_action, // * 激励动作：
           incentive_type: row.incentive_type, // * 激励类型：
           incentive_state: row.incentive_state, // * 状态：

@@ -32,7 +32,15 @@ export function updateActive(data) {
     data
   })
 }
-// 创建活动日志
+// 创建活动日志       // active_id	string
+// 活动id
+
+// active_name	string
+// 活动名称
+// record	string
+// 记录
+// type	string
+// 类型：用户 系统
 export function addActiveLog(data) {
   return request({
     url: '/manager/active/log/add',
@@ -76,5 +84,41 @@ export function updateActiveLinkUser(data) {
     url: `/manager/active/link/user/update`,
     method: 'post',
     data
+  })
+}
+
+// 导出活动日志详情
+export function exportActiveLogDetail(id) {
+  return request({
+    url: `/manager/active/log/list/export/${id}`,
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+// 审批购后分享奖励
+export function approvalRewards(data) {
+  return request({
+    url: `/manager/active/audit/epb`,
+    method: 'post',
+    data
+  })
+}
+
+// 分页获取购后分享奖励列表
+export function getApprovalRewards(params) {
+  return request({
+    url: `/manager/active/audit/epb/pages`,
+    method: 'get',
+    params
+  })
+}
+
+// 购后分享详情
+
+export function getRewardsDetail(id) {
+  return request({
+    url: `/manager/active/audit/epb/${id}`,
+    method: 'get'
   })
 }
